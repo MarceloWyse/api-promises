@@ -1,13 +1,21 @@
-var consultaCep = fetch('https://viacep.com.br/ws/96015710/json/')
-.then(resp1 => resp1.json()) //converte a resposta para json, retorne then caso a promessa seja resolvida
-.then(resp2 => {
-    if(resp2.erro){
-        throw Error('cep inválido');
+async function buscaEndereco(cep) {
+    try {
+    var consultaCep = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    var consultaCepConvertido = await consultaCep.json();
+    if(consultaCepConvertido.erro){
+        throw Error('Cep não existente');
     }
-    else{
-        console.log(resp2);
+    console.log(consultaCepConvertido); 
+    return consultaCepConvertido;   
     }
-    }) 
-.catch(e => console.log(e)) //retorna catch caso haja um erro, promessa não resolvida
-.finally(console.log('Concluído')); //executa independentemente da promessa concluída ou não
+    catch (e) {
+        console.log(e);
+    }
+}
+
+let ceps = ['96015710','01001000']; 
+let conjuntoCeps = ceps.map(e => buscaEndereco(e)) //map() retorna um array, nesse caso de promises
+Promise.all(conjuntoCeps).then(e => console.log(e)); //resolve o array de promises
+
+
 
